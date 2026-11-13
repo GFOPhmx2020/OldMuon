@@ -1,0 +1,91 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>反冲核直线射程示意</title>
+<style>body{margin:0;font:15px system-ui;color:#18324a;background:#f4f7fb}header,footer{padding:15px 24px}h2{margin:0 0 10px}label{margin-right:20px}canvas{width:100%;height:75vh;display:block;touch-action:none;background:white}select,button{padding:6px}#error{color:#a00}</style>
+<header><h2>反冲核直线射程示意 · 出生点 + 出生方向 × CSDA 射程</h2><div id="info"></div><p>
+<label>元素 <select id="element"><option value="0">全部</option></select></label>
+<label>过程 <select id="process"><option value="0">全部产生核</option><option value="1">hadElastic</option></select></label>
+<label>径迹显示倍率 <input id="factor" type="number" min="1" max="1000000000" value="1" step="10"></label><label style="display:none">点大小 <input id="size" type="range" min="1" max="6" step=".5" value="1"></label><label><input id="showGeometry" type="checkbox" checked>几何与坐标</label><button id="reset">重置视角</button></p><div id="error"></div></header>
+<div style="position:relative"><canvas id="view"></canvas><canvas id="reference" style="position:absolute;inset:0;pointer-events:none;background:transparent"></canvas></div><footer>左键拖动旋转；右键拖动或 Shift＋左键拖动平移（中键也可），滚轮缩放。每条线从出生点沿出生动量方向延伸，长度由原项目 Halite 射程表按出生动能双对数插值，不是实际多重散射路径或损伤轨迹。默认倍率1为真实比例；增大倍率只放大线长，不移动出生点。米级靶内纳米径迹可能不可见；放大后可越出靶边界。颜色区分元素，未做密度归一化。</footer>
+<script>
+// 平移量以屏幕像素保存：旋转不改变中心偏移，线框和数据共用。
+let panX=0,panY=0;
+
+const M=/*META*/null,B='/*BINARY*/';const $=x=>document.getElementById(x),canvas=$('view');
+const raw=atob(B),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+// 输入为原坐标转换的 Float32 GPU 数据：x,y,z,Z,hadElastic 标志；无分箱/位置扰动。
+const data=new Float32Array(bytes.buffer);let gl=canvas.getContext('webgl');
+if(!gl){$('error').textContent='浏览器未提供 WebGL，请在 Edge/Chrome 中开启硬件加速后打开。';throw Error('WebGL unavailable')}
+function shader(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s}
+const p=gl.createProgram();gl.attachShader(p,shader(gl.VERTEX_SHADER,`
+attribute vec3 xyz;attribute vec3 delta;attribute float element;attribute float elastic;
+uniform float az,tilt,zoom,aspect,scale,pointSize,selectZ,onlyElastic,factor;
+uniform float panXclip,panYclip;
+varying vec3 color;
+void main(){vec3 pos=xyz+delta*factor;float x=cos(az)*pos.x-sin(az)*pos.y;float y=sin(az)*pos.x+cos(az)*pos.y;
+float h=cos(tilt)*pos.z-sin(tilt)*y;float d=sin(tilt)*pos.z+cos(tilt)*y;
+color=.35+.30*cos(vec3(0.,2.,4.)+element*2.4);
+gl_Position=vec4(x*zoom/scale/aspect,h*zoom/scale,-d/(scale*4.),1.);
+gl_Position.xy+=vec2(panXclip,panYclip);
+if((selectZ>0. && abs(element-selectZ)>.1)||(onlyElastic>.5&&elastic<.5))gl_Position=vec4(3.,3.,3.,1.);
+gl_PointSize=pointSize;
+}`));gl.attachShader(p,shader(gl.FRAGMENT_SHADER,`precision mediump float;varying vec3 color;void main(){gl_FragColor=vec4(color,1.);}`));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));gl.useProgram(p);
+const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);
+for(const [name,n,offset] of [['xyz',3,0],['delta',3,12],['element',1,24],['elastic',1,28]]){const a=gl.getAttribLocation(p,name);gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,n,gl.FLOAT,false,32,offset)}
+const uniforms={};for(const name of ['panXclip','panYclip','az','tilt','zoom','aspect','scale','pointSize','selectZ','onlyElastic','factor'])uniforms[name]=gl.getUniformLocation(p,name);
+let az=.5,tilt=.25,zoom=1,drag=null;const symbols=['','H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al','Si','P','S','Cl','Ar','K','Ca'];
+for(const z of Object.keys(M.counts).sort((a,b)=>a-b)){const o=document.createElement('option');o.value=z;o.textContent='Z'+z+' '+(symbols[z]||'');$('element').append(o)}
+function draw(){const rect=canvas.getBoundingClientRect();canvas.width=rect.width;canvas.height=rect.height;gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(1,1,1,1);gl.enable(gl.DEPTH_TEST);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+const values={panXclip:2*panX/canvas.width,panYclip:-2*panY/canvas.height,az,tilt,zoom,aspect:canvas.width/canvas.height,scale:M.scale,pointSize:+$('size').value,selectZ:+$('element').value,onlyElastic:+$('process').value,factor:Math.max(1,Math.min(1e9,Number($('factor').value)||1))};for(const [k,v] of Object.entries(values))gl.uniform1f(uniforms[k],v);gl.drawArrays(gl.LINES,0,M.total*2);
+drawReference();
+let n=0;for(const [z,c] of Object.entries(M.counts))if(!values.selectZ||+z===values.selectZ)n+=c[values.onlyElastic];$('info').textContent=M.name+' | 共 '+M.total.toLocaleString()+' 条有效径迹；当前筛选 '+n.toLocaleString()+' 条；线长倍率 '+values.factor+'×；跳过无有效射程或方向 '+M.skipped+' 条 | 几何尺寸 '+M.dimensions;}
+// 参考层使用与 WebGL 顶点完全相同的旋转和正交投影，不受径迹倍率影响。
+function drawReference(){
+ const overlay=$('reference');overlay.width=canvas.width;overlay.height=canvas.height;
+ const ctx=overlay.getContext('2d');ctx.clearRect(0,0,overlay.width,overlay.height);
+ if(!$('showGeometry').checked)return;
+ const h=M.length/2,r=M.width/2,unit=M.length<=1?'cm':'m',convert=unit==='cm'?100:1;
+ function project(v){const [x,y,z]=v,u=Math.cos(az)*x-Math.sin(az)*y,w=Math.sin(az)*x+Math.cos(az)*y;
+ const vertical=Math.cos(tilt)*z-Math.sin(tilt)*w;
+ return [overlay.width/2+panX+u*zoom/M.scale*overlay.height/2,overlay.height/2+panY-vertical*zoom/M.scale*overlay.height/2];}
+ function line(a,b,color='#70869a',width=1){const p=project(a),q=project(b);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();}
+ function label(v,text,color='#25445e',dx=5,dy=-5){const p=project(v);ctx.font='12px sans-serif';ctx.lineWidth=3;ctx.strokeStyle='rgba(255,255,255,.9)';ctx.strokeText(text,p[0]+dx,p[1]+dy);ctx.fillStyle=color;ctx.fillText(text,p[0]+dx,p[1]+dy);}
+ if(M.geometry==='cube'){
+  for(let axis=0;axis<3;axis++)for(const a of [-r,r])for(const b of [-r,r]){const v=[0,0,0],w=[0,0,0];v[axis]=-r;w[axis]=r;v[(axis+1)%3]=w[(axis+1)%3]=a;v[(axis+2)%3]=w[(axis+2)%3]=b;line(v,w);}
+ }else{
+  for(const z of [-h,h])for(let i=0;i<96;i++){const a=i*2*Math.PI/96,b=(i+1)*2*Math.PI/96;line([r*Math.cos(a),r*Math.sin(a),z],[r*Math.cos(b),r*Math.sin(b),z]);}
+  for(let i=0;i<8;i++){const a=i*Math.PI/4;line([r*Math.cos(a),r*Math.sin(a),-h],[r*Math.cos(a),r*Math.sin(a),h]);}
+ }
+ // 三色坐标轴、端点和中间刻度。单位仅用于标签，原坐标仍以米保存。
+ const colors=['#bb3e35','#32814b','#3159b7'];
+ for(let axis=0;axis<3;axis++){
+  const extent=axis===2?h:r,neg=[0,0,0],end=[0,0,0];neg[axis]=-extent;end[axis]=extent*1.18;line(neg,end,colors[axis],1.6);
+  label(end,['X','Y','Z'][axis]+' ['+unit+']',colors[axis]);
+  for(const f of [-1,-.5,.5,1]){const v=[0,0,0];v[axis]=extent*f;const p=project(v);ctx.fillStyle=colors[axis];ctx.fillRect(p[0]-2,p[1]-2,4,4);label(v,Number((extent*f*convert).toPrecision(4)).toString(),colors[axis]);}
+ }
+ label([0,0,0],'O (0,0,0)','#333',6,15);
+ label([0,0,h],'顶面 z='+Number((h*convert).toPrecision(4))+' '+unit,'#333',12,-20);
+ label([0,0,-h],'底面 z='+Number((-h*convert).toPrecision(4))+' '+unit,'#333',12,20);
+ ctx.fillStyle='#25445e';ctx.font='13px sans-serif';ctx.fillText((M.geometry==='cube'?'立方体':'圆柱')+'参考线框（真实尺寸）；入射方向 +z；原点在靶中心',14,22);
+}
+canvas.onpointerdown=e=>{drag=[e.clientX,e.clientY];canvas.setPointerCapture(e.pointerId)};canvas.onpointerup=()=>drag=null;canvas.onpointercancel=()=>drag=null;canvas.onpointermove=e=>{if(!drag)return;az+=(e.clientX-drag[0])*.008;tilt+=(e.clientY-drag[1])*.008;drag=[e.clientX,e.clientY];draw()};canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.1,Math.min(20,zoom*Math.exp(-e.deltaY*.001)));draw()},{passive:false});for(const k of ['element','process','size','factor','showGeometry'])$(k).oninput=draw;$('reset').onclick=()=>{panX=0;panY=0;az=.5;tilt=.25;zoom=1;draw()};window.onresize=draw;draw();
+
+// 捕获阶段接管平移手势，避免同时触发原来的旋转/悬停处理。
+let panDrag=null;
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+canvas.addEventListener('pointerdown',e=>{
+ if(e.button===2||e.button===1||(e.button===0&&e.shiftKey)){
+  e.preventDefault();e.stopImmediatePropagation();
+  panDrag=[e.clientX,e.clientY];canvas.setPointerCapture(e.pointerId);
+  const tip=document.getElementById('tip');if(tip)tip.style.display='none';
+ }
+},true);
+canvas.addEventListener('pointermove',e=>{
+ if(!panDrag)return;e.preventDefault();e.stopImmediatePropagation();
+ panX+=e.clientX-panDrag[0];panY+=e.clientY-panDrag[1];
+ panDrag=[e.clientX,e.clientY];draw();
+},true);
+for(const type of ['pointerup','pointercancel'])canvas.addEventListener(type,e=>{
+ if(!panDrag)return;e.stopImmediatePropagation();panDrag=null;
+ if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+},true);
+
+</script></html>

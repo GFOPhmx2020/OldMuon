@@ -1,0 +1,10 @@
+# 深度以圆柱顶面为零；长度单位 m，曝光单位年
+input output_Halite_run03
+output samples/run03_depth_tracks
+years 470000
+depth_m 80 100
+depth_bins 4
+range_bins 100
+range_max_um 25
+# 三条曲线：所有核（含 Na、Cl）、Na 核、Cl 核
+elements all

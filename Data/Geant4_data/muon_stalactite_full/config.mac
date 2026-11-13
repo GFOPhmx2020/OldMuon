@@ -1,0 +1,50 @@
+# muon_stalactite_full 配置卡（UTF-8）
+# 本程序专用命令集，不是任意 Geant4 UI 宏；由程序在初始化前严格读取。
+# 每行：命令 值。单位写在命令名中，不要另加单位字段。
+# 路径相对此卡所在目录；含空格时加双引号。路径中不使用 # 字符。
+# 改卡片后直接 bash run.sh，无需重新 build。
+
+# 材料：Halite/Olivine/Quartz/Spinel/Apatite/Orthopyroxene/
+# Clinopyroxene/Diamond/Calcite/Obsidian/StdRock
+/stalactite/material Halite
+/stalactite/materials materials.tsv
+/stalactite/data ..
+# 输出目录不可已存在。每次运行更改此项，避免覆盖旧结果。
+/stalactite/output output_Halite_run04
+
+# 初级事件数（冒烟测试可改为 10）及随机种子
+/stalactite/events 100000
+/stalactite/seed 20261031
+/stalactite/progressEvery 1000
+
+# 圆柱几何：中心原点。StdRock 建议 length_m=1000；切材料不再自动改几何。
+/stalactite/radius_m 10
+/stalactite/length_m 100
+
+# GT 动能范围/指数。全下行半球、顶面均匀入射，GT 常数按用户原式固定。
+# 【最低入射 μ 子动能，必填，单位 GeV】只改下一行即可，例如 10、50 或 100。
+# 改后无需编译；下次运行自动重建抽样 CDF，并重新计算自然曝光时间。
+# 必须大于 0 且小于 energyMax_GeV；不是产生核的记录阈值。
+/stalactite/energyMin_GeV 100
+/stalactite/energyMax_GeV 10000
+/stalactite/gamma 2.7
+/stalactite/muPlusOverMinus 1.3
+# 联合 CDF 网格；增大可检查离散抽样收敛。
+/stalactite/energyBins 800
+/stalactite/angleBins 400
+
+# 生产 cut 和核记录阈值。后者只筛选输出，不停止粒子输运。
+/stalactite/productionCut_mm 0.005
+/stalactite/recordThreshold_MeV 0.001
+
+# XZ 与 z-射程直方图分箱。射程为对数分箱，范围外仍保留 CSV/ROOT 溢出。
+/stalactite/xBins 80
+/stalactite/zBins 100
+/stalactite/rangeBins 100
+/stalactite/rangeMin_nm 0.001
+/stalactite/rangeMax_nm 10000000
+
+# 交互 HTML 圆柱体素：等体积径向分箱 × 方位角 × z；总格数不超过 100000。
+/stalactite/htmlRadialBins 10
+/stalactite/htmlPhiBins 24
+/stalactite/htmlZBins 50

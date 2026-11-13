@@ -1,0 +1,8 @@
+build/
+vendor/
+results/
+__pycache__/
+local_env.sh
+build_*/
+vendor_*/
+.venv/

@@ -1,0 +1,22 @@
+# 单能束流配置。单位写于命令名；路径相对此卡。能量未指定时默认100 GeV。
+/beam/material Halite
+#/beam/particle mu-
+#/beam/energy_GeV 3
+/beam/particle ion
+/beam/ionZ 8
+/beam/ionA 18
+/beam/ionQ 6
+/beam/energy_GeV 46.8
+/beam/side_cm 10
+/beam/spotRadius_cm 3
+/beam/events 10000
+/beam/seed 20261101
+#/beam/output output_Halite_beam05
+/beam/output output_Halite_O18_2p6GeVu_01
+/beam/data ..
+# run.sh 从项目 YAML 生成此表；请保留该项。
+/beam/materials materials.tsv
+/beam/recordThreshold_MeV 0.001
+/beam/productionCut_mm 0.005
+/beam/xBins 80
+/beam/zBins 100

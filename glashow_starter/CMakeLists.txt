@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 3.16)
+project(GlashowStarter LANGUAGES CXX)
+# 默认启用编译优化；不使用 fast-math，不改变浮点精度/物理参数。
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(Geant4 REQUIRED)
+find_package(ZLIB REQUIRED)
+include(${Geant4_USE_FILE})
+
+set(PYTHIA8_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/vendor/pythia8317" CACHE PATH "PYTHIA source/build or installation directory")
+# 依赖路径由 env.sh / local_env.sh 提供；源码中没有固定的本机盘符。
+find_path(PYTHIA8_INCLUDE_DIR Pythia8/Pythia.h HINTS "${PYTHIA8_ROOT}/include" NO_DEFAULT_PATH)
+find_library(PYTHIA8_LIBRARY NAMES pythia8 HINTS "${PYTHIA8_ROOT}/lib" "${PYTHIA8_ROOT}/lib64" NO_DEFAULT_PATH)
+if(NOT PYTHIA8_INCLUDE_DIR OR NOT PYTHIA8_LIBRARY)
+  message(FATAL_ERROR "PYTHIA not built/found. Follow README_先读我.md, or pass -DPYTHIA8_ROOT=/path/to/pythia")
+endif()
+add_executable(GlashowRun GlashowRun.cc)
+target_include_directories(GlashowRun PRIVATE "${PYTHIA8_INCLUDE_DIR}")
+target_link_libraries(GlashowRun PRIVATE ${Geant4_LIBRARIES} "${PYTHIA8_LIBRARY}" ZLIB::ZLIB ${CMAKE_DL_LIBS})
+
+# 小型输出层测试：检查压缩无损、缓冲刷新和磁盘写入错误。
+include(CTest)
+if(BUILD_TESTING)
+  add_executable(test_output test_output.cc)
+  target_link_libraries(test_output PRIVATE ZLIB::ZLIB)
+  add_test(NAME output_roundtrip COMMAND test_output "${CMAKE_CURRENT_BINARY_DIR}/output_test")
+endif()

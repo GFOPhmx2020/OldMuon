@@ -1,0 +1,6 @@
+# 后处理卡。路径相对此文件，坐标为靶中心坐标系，单位 m。
+/sample/input output_Halite_run04
+/sample/output samples/run04_bottom_1000
+# x y z 中心与沿三个坐标轴的完整边长
+/sample/center_m 0 0 -45
+/sample/size_m 10 10 10

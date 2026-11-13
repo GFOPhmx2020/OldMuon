@@ -1,0 +1,118 @@
+
+===== Host / compiler / build tools =====
+farm.phy.pku.edu.cn
+Linux x86_64
+/usr/bin/c++
+c++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)
+Copyright (C) 2021 Free Software Foundation, Inc.
+/usr/bin/g++
+g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)
+Copyright (C) 2021 Free Software Foundation, Inc.
+/usr/bin/cmake
+cmake version 3.31.8
+
+/usr/bin/make
+GNU Make 4.3
+Built for x86_64-redhat-linux-gnu
+/usr/bin/python3
+Python 3.9.25
+/opt/geant4/bin/geant4-config
+11.3.2
+NOT ON PATH: pythia8-config
+CXX=not set
+C++17 headers/syntax: OK
+zlib header: OK
+zlib linker candidate: /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/libz.so
+
+===== Loaded Geant4 and dataset paths =====
+Geant4_DIR=
+GEANT4_SH=
+CMAKE_PREFIX_PATH=
+/data/pku/opt/geant4
+G4NDL G4NEUTRONHPDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4NDL4.7.1
+G4EMLOW G4LEDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4EMLOW8.6.1
+PhotonEvaporation G4LEVELGAMMADATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/PhotonEvaporation6.1
+RadioactiveDecay G4RADIOACTIVEDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/RadioactiveDecay6.1.2
+G4PARTICLEXS G4PARTICLEXSDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4PARTICLEXS4.1
+G4PII G4PIIDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4PII1.3
+RealSurface G4REALSURFACEDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/RealSurface2.2
+G4SAIDDATA G4SAIDXSDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4SAIDDATA2.0
+G4ABLA G4ABLADATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4ABLA3.3
+G4INCL G4INCLDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4INCL1.2
+G4ENSDFSTATE G4ENSDFSTATEDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4ENSDFSTATE3.0
+G4CHANNELING G4CHANNELINGDATA /afs/cern.ch/user/g/gunter/l/releases/web/11.3.2/install/Geant4-11.3.2-Linux/share/Geant4/data/G4CHANNELING1.0
+EXISTS GEANT4_DATA_DIR=/opt/geant4/share/Geant4/data
+
+===== Software candidates (bounded search; not proof of completeness) =====
+
+Search: /opt
+Search incomplete (status 1: timeout or access restriction).
+
+Search: /usr/local
+
+Search: /data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor
+/data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317/include/Pythia8/Pythia.h
+/data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317/lib/libpythia8.a
+/data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317/lib/libpythia8.so
+/data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317/share/Pythia8/xmldoc/Index.xml
+
+===== Configured / bundled PYTHIA candidates =====
+
+PYTHIA root: /data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317
+OK include/Pythia8/Pythia.h
+OK share/Pythia8/xmldoc/Index.xml
+/data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317/lib/libpythia8.a: current ar archive
+/data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317/lib/libpythia8.so: ELF 64-bit LSB shared object, x86-64, version 1 (GNU/Linux), dynamically linked, BuildID[sha1]=654410f8f9909ff5bb17493e0337ab30e8d2c44b, not stripped
+/data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317/lib/libpythia8.so: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found (required by /data/pku/home/SJH2025/primus-paleo/glashow_starter/vendor/pythia8317/lib/libpythia8.so)
+	linux-vdso.so.1 (0x00007ffdebbfc000)
+	libstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007f9c8bc00000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007f9c8bb23000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f9c8beca000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f9c8b800000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f9c8c9bc000)
+
+===== Python analysis packages =====
+Python executable: /usr/bin/python3
+numpy 1.23.5 /usr/lib64/python3.9/site-packages/numpy/__init__.py
+matplotlib 3.9.4 /usr/local/lib64/python3.9/site-packages/matplotlib/__init__.py
+
+===== Na/Cl range tables for analysis =====
+OK /data/pku/home/SJH2025/primus-paleo/glashow_starter/../Data/Geant4_data/Halite/Range/DEDX_Z11_A23.txt
+OK /data/pku/home/SJH2025/primus-paleo/glashow_starter/../Data/Geant4_data/Halite/Range/DEDX_Z17_A35.txt
+OK /data/pku/home/SJH2025/primus-paleo/glashow_starter/../Data/Geant4_data/Halite/Range/DEDX_Z17_A37.txt
+
+===== Scheduler commands / disk space =====
+module is a function
+module () 
+{ 
+    local _mlredir=1;
+    if [ -n "${MODULES_REDIRECT_OUTPUT+x}" ]; then
+        if [ "$MODULES_REDIRECT_OUTPUT" = '0' ]; then
+            _mlredir=0;
+        else
+            if [ "$MODULES_REDIRECT_OUTPUT" = '1' ]; then
+                _mlredir=1;
+            fi;
+        fi;
+    fi;
+    case " $@ " in 
+        *' --no-redirect '*)
+            _mlredir=0
+        ;;
+        *' --redirect '*)
+            _mlredir=1
+        ;;
+    esac;
+    if [ $_mlredir -eq 0 ]; then
+        _module_raw "$@";
+    else
+        _module_raw "$@" 2>&1;
+    fi
+}
+Filesystem           Size  Used Avail Use% Mounted on
+192.168.1.98:/store   73T   73T  135G 100% /data/pku
+192.168.1.98:/store   73T   73T  135G 100% /data/pku
+
+===== Conclusion =====
+Discovery only: directory presence does not verify dataset completeness or binary compatibility.
+Use a fresh build directory; CMake configure/link and a small transport run are the final checks.

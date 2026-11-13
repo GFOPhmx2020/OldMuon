@@ -1,0 +1,11 @@
+# Snapshot of Data/mineral_library.yaml: name density_g_cm3 element relative_atom_count ...
+Halite 2.16 Na 1 Cl 1
+Olivine 3.3 Mg 2.57 Fe 0.29 Si 1.43 O 5.71
+Quartz 2.6 Si 1 O 2
+Spinel 3.7 Mg 1 Al 2 O 4
+Apatite 3.15 Ca 5 P 3 O 12.025 F 0.9 Cl 0.05 H 0.025
+Orthopyroxene 3.25 Fe 0.2 Mg 1.8 Si 2 O 6
+Clinopyroxene 3.4 Fe 0.1 Mg 0.9 Si 2 O 6 Ca 1
+Diamond 3.5 C 1
+Calcite 2.7 Ca 1 C 1 O 3
+Obsidian 2.4 O 100 Si 41 Al 8 K 3.7 Na 3.3 Fe 0.5 Ca 0.5

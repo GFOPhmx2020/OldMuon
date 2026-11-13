@@ -1,0 +1,25 @@
+Data/images/*
+Data/Geant4_data/build/*
+__pycache__/
+Data/models/**
+Data/profiler_calibration/**
+# Local environments and generated artifacts
+.ipynb_checkpoints/
+.vscode/
+.venv/
+local_env.sh
+build/
+build-*/
+build_*/
+sampler_build/
+CMakeFiles/
+CMakeCache.txt
+*.o
+*.so
+*.a
+*.log
+/output/
+Data/Geant4_data/muon_beam/output*/
+Data/Geant4_data/muon_beam/samples/
+Data/Geant4_data/muon_stalactite_full/output*/
+Data/Geant4_data/muon_stalactite_full/samples/

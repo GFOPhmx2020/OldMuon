@@ -1,0 +1,2 @@
+# Preserve data and source in Git archives. Large reproduction data ship separately.
+*.sh text eol=lf
