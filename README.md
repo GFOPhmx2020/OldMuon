@@ -3,7 +3,8 @@
 本仓库基于上游 PRImuS / primus-paleo，包含矿物响应分析、束流模拟、大气缪子空间模拟、Glashow 共振强子末态输运和可视化工具。仓库已发布至 `GFOPhmx2020/OldMuon`（私有），供获得授权的合作者使用。以下命令面向 Linux / WSL Bash。
 
 ## 1. 按研究目标选择入口
-
+项目1，2，3是我们最近研究的项目。其它的来自另一个项目库https://github.com/cgalelli/primus-paleo 
+感谢！！
 | 研究目标 | 入口 | 类型 |
 |---|---|---|
 | 岩盐长期曝光与径迹谱 | `MSC_analysis_new.ipynb`、`MSC_analysis_local.ipynb` | 读取预计算数据 |
@@ -11,9 +12,9 @@
 | 石英覆盖层历史 | `RSC_analysis.ipynb` | 读取预计算数据，存在已知缺表问题 |
 | 飞行运输产生的贡献 | `Estimate_flight_contribution.ipynb` | 分析并保存结果 |
 | 旧六列数据沿 z 的核出生分布 | `muon_stalactite.ipynb` | 分析及 PyROOT 绘图 |
-| 单能缪子、质子或离子照射立方体 | `Data/Geant4_data/muon_beam` | Geant4 输运 |
-| 大气缪子照射圆柱与空间取样 | `Data/Geant4_data/muon_stalactite_full` | Geant4 输运及后处理 |
-| W 强子末态在岩盐中的级联 | `glashow_starter` | PYTHIA + Geant4 |
+| 单能缪子、质子或离子照射立方体 | `Data/Geant4_data/muon_beam` | 项目1.惠州束流 |
+| 大气缪子照射圆柱与空间取样 | `Data/Geant4_data/muon_stalactite_full` | 项目2.缪子钟乳石 |
+| W 强子末态在岩盐中的级联 | `glashow_starter` | 项目3.RockCube |
 | Glashow 出生点与直线射程显示 | `glashow_starter/html_recoils` | 读取已有结果 |
 | 原框架响应表与射程表生成 | `Data/Geant4_data/run_geant.ipynb` | 数据生成，不是日常分析入口 |
 | 显微图像径迹识别 | `Test_optimusprimus.ipynb` | 可选模块，当前缺图像与模型 |
@@ -22,7 +23,7 @@
 
 ## 2. 获取项目与准备环境
 
-接受仓库邀请并完成 GitHub 登录后：
+完成 GitHub 登录后：
 
 ```bash
 git lfs install
@@ -35,18 +36,7 @@ python -m pip install numpy scipy pandas matplotlib mendeleev PyYAML tqdm jupyte
 python -m ipykernel install --user --name oldmuon --display-name 'Python (OldMuon)'
 ```
 
-每次打开新终端，先进入实际仓库目录，再设置 `PROJECT_ROOT`、激活环境。它指向仓库根目录，不是外层 Old_Muon 工作文件夹。
-
-| 功能 | 额外环境 |
-|---|---|
-| 预计算矿物响应分析 | 上述 Python 包；现有通量缓存齐全时不必运行 MCEq |
-| 旧数据 ROOT 绘图 | 与 Python 版本兼容的 ROOT/PyROOT |
-| 两套束流/大气模拟 | C++ 编译器、CMake、Geant4及物理数据、ROOT；束流脚本还需 PyYAML |
-| Glashow 模拟 | Geant4、PYTHIA、C++17、CMake、zlib；普通能谱图另需 numpy/matplotlib |
-| 重新计算通量 | MCEq、crflux及对应数据 |
-| 图像识别 | PyTorch、torchvision、timm、segmentation_models_pytorch、albumentations、OpenCV、Pillow、scikit-image、scikit-learn等 |
-
-Geant4、ROOT、PYTHIA 需要单独安装并加载环境。安装路径由每位合作者自行指定，例如：
+Geant4、ROOT 需要单独安装并加载环境。安装路径由每位合作者自行指定，例如：
 
 ```bash
 # 先将变量设为本机安装目录，再执行；不要照抄他人的安装路径
@@ -54,8 +44,6 @@ source "$GEANT4_PREFIX/bin/geant4.sh"
 source "$ROOT_PREFIX/bin/thisroot.sh"
 python -c 'import ROOT; print(ROOT.gROOT.GetVersion())'
 ```
-
-依赖成功导入不等于全部流程已验证。存在 `requirements-analysis.txt` 时可参考其中的历史版本记录，它不是完整环境锁文件。
 
 ## 3. 岩盐、橄榄石、石英与飞行贡献 Notebook
 
@@ -213,6 +201,188 @@ Python标准库即可运行；需要完整运行的run.json、recoils表和Halit
 - 抽样测试、编译成功、完整输运及物理模型验证分别记录。
 - 修改参数、数据字段或归一化时同步修改对应README；记录代码提交、环境版本、配置、种子和数据来源。
 - 使用功能分支和Pull Request协作。现有输出及构建目录可能被.gitignore排除，缺数据时联系维护者。
+
+## 11. 运行与分析配置卡（.mac）说明
+
+### 11.1 每个入口使用哪种配置
+
+| 运行或分析入口 | 配置文件/方式 | 修改后是否需要重新输运 |
+|---|---|---|
+| `muon_beam/run.sh` → `run_beam.py` → `muon_beam` | 同目录 `config.mac`，键以 `/beam/` 开头 | 束流、材料、几何等变化需要新运行 |
+| `muon_stalactite_full/run.sh` → 同名可执行文件 | 同目录 `config.mac`，键以 `/stalactite/` 开头 | 模拟配置变化需要新运行 |
+| `analyze_sample.py` | `sample.mac`，键以 `/sample/` 开头 | 不需要，只重新选择已有出生点 |
+| `analyze_depth_tracks.py` | `depth_tracks.mac` 或 `depth_tracks_run04.mac`，键无前缀 | 不需要，重算已有数据的加权谱 |
+| `cylinder_density.py` | 可用 `--card 配置卡`；也可直接传输出目录和分箱参数 | 不需要，只重新绘图 |
+| `render_birth_points.py`、`render_recoil_tracks.py` | 不读取独立mac；命令行传运行目录 | 不需要 |
+| `plot_depth_tracks.C`、`plot_depth_tracks_full.C` | ROOT宏，后缀是 `.C`，不是 `.mac`；读取分析CSV/模拟数据 | 不需要，须检查宏内路径及参数 |
+| `glashow_starter/run.sh` | 命令行参数和 `local_env.sh`，无运行mac | 模拟参数变化需要新运行 |
+| `glashow_starter/analyze.py`、`audit_partial.py`、`html_recoils/render_glashow.py` | 命令行传目录/选项，无mac | 不需要 |
+| 第3节全部分析Notebook、`muon_stalactite.ipynb` | Notebook参数单元，无mac | 分析本身不重跑输运，须有对应输入 |
+| `Test_optimusprimus.ipynb` | Notebook中的图像路径、模型和训练参数，无mac | 不涉及Geant4输运 |
+| `Data/Geant4_data/run_geant.ipynb` | 自动生成 `build/materials.mac` 和 `build/run.in` | 执行模拟单元会进行新输运 |
+
+前三类专用前缀卡和深度谱卡由各自程序解析，**不能互换，也不能在其中随意加入 `/run/beamOn`、`/gun/energy` 等标准Geant4命令**。后缀相同不代表格式相同。
+
+配置卡内相对输入/输出路径以卡片所在目录为基准。复制卡片时建议放在原程序目录，只改文件名。数值单位已写在键名里：例如 `/beam/energy_GeV 100`，不要追加 `GeV`。标准Geant4宏则需要相应命令的单位参数。注释以 `#` 开头，不要保留重复的有效配置键。下表列的是当前卡片值，不保证等于程序在缺省参数时采用的值。
+
+### 11.2 项目1：惠州束流 config.mac
+
+位置：`Data/Geant4_data/muon_beam/config.mac`。以下参数名均带 `/beam/` 前缀。
+
+| 参数 | 当前值 | 物理含义或用途 |
+|---|---|---|
+| `material` | `Halite` | 靶材料，名称与材料库匹配 |
+| `particle` | `ion` | `mu-`、`mu+`、`proton` 或 `ion` |
+| `ionZ / ionA / ionQ` | `8 / 18 / 6` | 离子原子序数、质量数、电荷态；ion时使用，Q以元电荷为单位 |
+| `energy_GeV` | `46.8` | 每个入射粒子的动能GeV；O18的2.6 GeV/u对应18×2.6=46.8 GeV，不直接填2.6 |
+| `side_cm` | `10` | 立方体完整边长cm |
+| `spotRadius_cm` | `3` | 圆盘束斑半径cm，应不超过立方体半边长 |
+| `events` | `10000` | 初级粒子事件数 |
+| `seed` | `20261101` | 随机种子 |
+| `output` | `output_Halite_O18_2p6GeVu_01` | 新运行输出目录，不得已存在 |
+| `data` | `..` | 射程数据根目录，即Geant4_data |
+| `materials` | `materials.tsv` | run_beam.py根据项目YAML生成的材料表 |
+| `recordThreshold_MeV` | `0.001` | 次级核出生动能记录阈值，0.001 MeV=1 keV；不是初级束能，也不是输运截断 |
+| `productionCut_mm` | `0.005` | Geant4 production cut，长度单位mm；不是统一最低粒子动能 |
+| `xBins / zBins` | `80 / 100` | ROOT XZ图分箱数 |
+
+沿用卡片其他字段、改做100 GeV负缪子10事件试跑时，把相应行改成：
+
+```text
+/beam/particle mu-
+/beam/energy_GeV 100
+/beam/events 10
+/beam/output output_Halite_mu_smoke01
+```
+
+这些是修改片段，不是完整卡。运行 `bash run.sh config_my_run.mac`。HTML体素分箱由Python命令行 `--nx`、`--ny`、`--nz` 设置，不是上述mac键，例如 `bash run.sh config_my_run.mac --nx 20 --ny 20 --nz 20`。
+
+### 11.3 项目2：缪子钟乳石 config.mac
+
+位置：`Data/Geant4_data/muon_stalactite_full/config.mac`。以下参数名均带 `/stalactite/` 前缀。
+
+| 参数 | 当前值 | 含义 |
+|---|---|---|
+| `material / materials / data` | `Halite / materials.tsv / ..` | 材料名称、材料表、射程数据根目录 |
+| `output` | `output_Halite_run04` | 新模拟目录 |
+| `events / seed / progressEvery` | `100000 / 20261031 / 1000` | 事件数、种子、进度输出间隔 |
+| `radius_m / length_m` | `10 / 100` | 圆柱半径和完整长度m；中心为原点 |
+| `energyMin_GeV / energyMax_GeV` | `100 / 10000` | 入射缪子动能抽样范围；0<下限<上限 |
+| `gamma` | `2.7` | GT通量模型的谱指数参数 |
+| `muPlusOverMinus` | `1.3` | 正负缪子数量比 |
+| `energyBins / angleBins` | `800 / 400` | 能量—角度联合抽样CDF网格；不是输出能谱分箱 |
+| `productionCut_mm` | `0.005` | Geant4 production cut |
+| `recordThreshold_MeV` | `0.001` | 核出生记录阈值；不停止低于阈值的粒子输运 |
+| `xBins / zBins` | `80 / 100` | ROOT位置图分箱 |
+| `rangeBins` | `100` | 射程分箱数 |
+| `rangeMin_nm / rangeMax_nm` | `0.001 / 10000000` | 射程图范围nm，采用对数分箱 |
+| `htmlRadialBins / htmlPhiBins / htmlZBins` | `10 / 24 / 50` | 圆柱HTML径向、方位角、轴向分箱；乘积不得超过100000 |
+
+运行 `bash run.sh config_my_run.mac`。只修改配置值无需重新编译；修改C++或新增命令后需重新构建。改变能窗、几何、事件数会改变等效曝光，不能继续套用旧运行的时间换算。
+
+仅重画历史密度图可运行：
+
+```bash
+python3 cylinder_density.py output_Halite_run04 --nr 10 --nphi 24 --nz 50
+```
+
+这是对既有数据重新分箱，不能改变那次模拟实际采用的几何或能窗。
+
+### 11.4 局部体积分析 sample.mac
+
+位置：`Data/Geant4_data/muon_stalactite_full/sample.mac`。这是 `analyze_sample.py` 的后处理输入，不传给Geant4。
+
+```text
+/sample/input output_Halite_run04
+/sample/output samples/my_bottom_box01
+/sample/center_m 0 0 -45
+/sample/size_m 10 10 10
+```
+
+| 键 | 说明 |
+|---|---|
+| `/sample/input` | 含metadata.txt和nuclei.csv的已有模拟目录 |
+| `/sample/output` | 新分析目录，不能已存在 |
+| `/sample/center_m x y z` | 盒中心在原靶坐标中的位置m，原点为圆柱中心 |
+| `/sample/size_m dx dy dz` | 盒子的三个完整边长m，不是半长 |
+
+全部四个键必须出现且不能重复。取样盒必须完全位于原圆柱内。对100 m长圆柱，上例取z∈[-50,-40]m，对应顶面以下90–100 m；不能把z=-45 m读作顶面以下45 m。
+
+执行 `python3 analyze_sample.py sample_my_run.mac`。输出的x/y/z相对取样盒中心，global_x_m等保留原坐标；depth_m仍相对原靶顶面。没有出生方向的旧数据只能画出生点。修改卡片不改变原模拟CSV。
+
+### 11.5 深度—射程谱 depth_tracks.mac
+
+位置：`Data/Geant4_data/muon_stalactite_full/`。这类卡片的键**不加 `/sample/` 或 `/stalactite/` 前缀**。
+
+```text
+input output_Halite_run03
+output samples/my_run03_depth01
+years 470000
+depth_m 80 100
+depth_bins 4
+range_bins 100
+range_max_um 25
+elements all
+```
+
+| 键 | 含义 |
+|---|---|
+| `input` | 已有模拟目录，需要metadata.txt和nuclei.csv |
+| `output` | 本次分析目录，建议每次使用新名称 |
+| `years` | 目标累计曝光年数，不是程序运行时间 |
+| `depth_m lo hi` | 相对圆柱顶面的深度区间m，须处于实际靶长内 |
+| `depth_bins` | 深度等宽分层数量；80–100 m分4层，每层5 m |
+| `range_bins` | 0到range_max_um内的线性射程分箱数量 |
+| `range_max_um` | 射程显示上限μm；当前25，配合100箱时箱宽0.25 μm；超出上限另行统计 |
+| `elements` | 当前解析器只接受 `all`，同时生成所有核、Na、Cl三组，不支持直接写Na或Cl |
+
+`depth_tracks.mac` 指向run03；`depth_tracks_run04.mac` 指向run04及对应输出。`reproduce_depth.mac` 是本地核验时的卡片，不是新的物理模型；如仓库有该文件，使用前同样检查input/output。
+
+执行 `python3 analyze_depth_tracks.py depth_my_run.mac`。质量归一化还读取程序旁的materials.tsv；years的缩放使用输入metadata中的等效曝光。只改years相当于按原模拟的同一通量条件线性外推，不会模拟新的覆盖层历史。
+
+### 11.6 项目3：RockCube没有运行mac
+
+Glashow的 `run.sh` 接收位置参数，不接受上述config.mac：
+
+```bash
+bash run.sh 6320000 1 12347 results/my_small02 0.1 0.2
+```
+
+对应能量GeV、事件数、种子、输出目录、半径m、长度m。`local_env.sh` 管理安装路径、构建位置及环境开关；`pythia_settings.cmnd` 是运行保存的生成器设置记录，`run.json` 是运行元数据，不是编辑后即可重跑的mac。
+
+`GLASHOW_SECONDARY_MIN_MEV` 控制次级粒子截断，`GLASHOW_COMPRESS` 控制输出压缩。**如果local_env.sh无条件export了同名变量，它会覆盖命令前设置的值。** 要改变阈值，应同步修改或注释local_env.sh中的赋值，并核对新run.json记录的真实阈值。
+
+后处理也使用命令行，不另造mac：
+
+```bash
+python3 analyze.py results/my_small02
+python3 audit_partial.py results/my_interrupted_run partial_summary.json
+python3 html_recoils/render_glashow.py results/my_small02 --max-points 200000
+```
+
+目录应替换为真实完整或中断运行。HTML工具的 `--event` 指定事件号、`--min-mev` 指定显示最低出生动能、`--range-dir` 指定射程表目录、`--analysis-selection` 使用与analyze.py一致的核筛选。显示筛选不改变输运阈值，也不能恢复已被截断的粒子。
+
+### 11.7 上游 run_geant.ipynb 自动生成的宏
+
+它与前三类专用配置卡不同：生成真正的Geant4命令宏，由 `build/Run` 执行。
+
+- `build/materials.mac`：由 `Data/mineral_library.yaml` 生成，使用 `/testhadr/defineMaterial` 定义材料。应修改YAML后重新生成，而非长期手改派生宏。
+- `build/run.in`：虽不是.mac后缀，内容仍是Geant4宏；由 `run_geant4_simulation(...)` 生成并执行。
+
+| 生成的命令 | 来源/用途 |
+|---|---|
+| `/control/execute <材料宏>` | 加载materials.mac |
+| `/testhadr/TargetMat` | mineral_name |
+| `/testhadr/TargetRadius ... m` | target_radius_m |
+| `/testhadr/TargetLength ... m` | target_length_m |
+| `/run/setCut 0.005 mm` | 此生成函数中的production cut设置 |
+| `/run/initialize` | 初始化物理与几何 |
+| `/gun/particle` | particle_type |
+| `/gun/ion Z A Q E` | ion模式的离子设置；当前生成函数使用Q=Z、激发能0 |
+| `/gun/energy ... GeV` | energies_gev中的每个能量点 |
+| `/run/beamOn N` | 每个能量点的n_events |
+
+从Notebook修改函数参数再生成宏。调用会更新build/run.in，并移动输出至材料/粒子目录；已有同名响应文件须事先妥善保存。`geometry.json` 是配套记录，不能只复制outNuclei而遗漏它。
 
 ## 来源与许可
 
